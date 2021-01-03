@@ -41,7 +41,13 @@ Benefits from BanditPolicy: it is conceptually simple, it improves computational
 policy = BanditPolicy(evaluation_interval=2, slack_factor=0.1)
 
 ## AutoML
-Using the AutoML, VotingEnsemble model performed the best with the accuracy of 91.61%. The experiment type is classification. Cross-validation=2; the metrics are calculated with the average of the 2 validation metrics.
+Using the AutoML, VotingEnsemble model performed the best with the accuracy of 91.61%. 
+Compute target is remote. The experiment type to run is classification. 
+The primary metric that Automated Machine Learning will optimize for model selection is accuracy.
+label_column_name is the training labels to use when fitting pipelines during an experiment. This is the value the model predicts. 
+Maximum amount of time in minutes that all iterations combined can take before the experiment terminates is 30 minutes.
+(ONNX) can help optimize the inference of the machine learning model. Inference, or model scoring, is the phase where the deployed model is used for prediction
+Cross-validation=2; the metrics are calculated with the average of the 2 validation metrics.
 The Automl Config:
 
 automl_config = AutoMLConfig(
