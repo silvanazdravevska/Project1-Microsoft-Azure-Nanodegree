@@ -2,15 +2,18 @@
 
 ## Overview
 This project is part of the Udacity Azure ML Nanodegree.
-In this project, we build and optimize an Azure ML pipeline using the Python SDK and a provided Scikit-learn model.
-This model is then compared to an Azure AutoML run.
+In this project, we build and optimize an Azure ML pipeline using Python SDK.
+For optimization with HyperDrive are being used the Scikit-learn Logistic Regression—the hyperparameters.
+Then an AutoML model is build and optimized on the same dataset, for comparison of the results of the two methods
+
 
 ## Summary
-This dataset contains marketing data of a bank about certain individuals. We seek to predict weather an individual would consider a bank deposit.
-
+This dataset contains marketing data of a bank about certain individuals. The aim is to predict if the customer subscribes to a fixed term deposit or not.
 The better performing model was the AutoML model It had an accuracy of 0.9161. In contrast, the HyperDrive model has accuracy of 0.90966.
 
 ## Scikit-learn Pipeline
+The dataset was imported from specifies URL of Bank Marketing Data. It was pre-processed in the clean_data function of train.py file and split into training and testing. After that Logistic Regression Model was used for training with tuning hyperparameters such as C and max_iter using HyperDrive.
+Hyperparameter tuning is the process of finding the configuration of hyperparameters that results in the best performance. The process is typically computationally expensive and manual.
 The HyperDriveConfig:
 
 hyperdrive_config = HyperDriveConfig(estimator=est,
@@ -22,6 +25,8 @@ hyperdrive_config = HyperDriveConfig(estimator=est,
                                      max_concurrent_runs=4)
 
 Parameter Sampler used is RandomParameterSampling, it defines random sampling over a hyperparameter search space.
+Benefits from RandomParameterSampling: easy method to extract a research sample from a larger population, it allows the search space to include both discrete and continuous hyperparameters, it supports early termination of low-performance runs. 
+C is the Regularization while max_iter is the maximum number of iterations.
 
 ps = RandomParameterSampling(
     {
@@ -30,11 +35,13 @@ ps = RandomParameterSampling(
     }
 )
 
-Early Stopping Policy used is BanditPolicy. It defines an early termination policy based on slack criteria, and a frequency and delay interval for evaluation.
+Early Stopping Policy used is BanditPolicy. It defines an early termination policy based on slack criteria, and a frequency and delay interval for evaluation. 
+Benefits from BanditPolicy: it is conceptually simple, it improves computational efficiency, it terminates runs where the primary metric is not within the specified slack factor/slack amount compared to the best performing run.
 
 policy = BanditPolicy(evaluation_interval=2, slack_factor=0.1)
 
 ## AutoML
+Using the AutoML, VotingEnsemble model performed the best with the accuracy of 91.61%. The experiment type is classification. Cross-validation=2; the metrics are calculated with the average of the 2 validation metrics.
 The Automl Config:
 
 automl_config = AutoMLConfig(
@@ -48,16 +55,18 @@ automl_config = AutoMLConfig(
     n_cross_validations=2)
 
 ## Pipeline comparison
+The Hyperparameter Model had accuracy of 90.97%, and the AutoML was with accuracy of 91.61% i.e. difference is 0.64%.
+This difference was because in HyperDrive we specified a fixed model (Logistic Regression) and could only improve the hyperparameters, whereas AutoML gave us the flexibility to use various models and get the best result.
 
 Hyperparameter Model Best Run: Accuracy = 0.9096611026808296, Duration = 47.84s, Max iterations = 200, --C = 0.16980643557917052, Regularization Strenght = 0.16980643557917052
 AutoML Best Run: Accuracy = 0.9161153262518968, Duration = 1m 36.31s, Algorithm Name = Voting Ensemble, AUC Macro = 0.94673, AUC Micro = 0.98052
 
 ## Future work
-As the existing data has class imbalance problem we can do better pre-processing of data or get more data to balance it and to explore the important features which can result in better performance with quality data
-
+Class imbalance is a very common issue in classification problems in machine learning. Imbalanced data negatively impact the model's accuracy because it is easy for the model to be very accurate just by predicting the majority class, while the accuracy for the minority class can fail.
+As the existing data has class imbalance problem we can do better pre-processing of data or get more data to balance it and to explore the important features which can result in better performance with quality data.
+Usage of different metric, like AUC, better fit for imbalanced data.
 Using different combinations of hyperparameters like C and max_iter with HyperDrive and also try using different loss algorithm parameters.
-
-In AutoML we can try other values for cross validation to improve accuracy
+In AutoML we can try other values for cross validation to improve accuracy.  cross-validation is the process of taking many subsets of the full training data and training a model on each subset, the higher the number of cross validations is, the higher the accuracy achieved is, but with caution to cost.
 
 
 ## Proof of cluster clean up
